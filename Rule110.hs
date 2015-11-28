@@ -1,4 +1,5 @@
-module Rule110 where
+import System.Environment
+import System.Exit
 
 data Cell = Alive | Dead
      deriving (Show, Eq)
@@ -12,31 +13,44 @@ step Dead  Alive Dead  = Alive
 step Dead  Dead  Alive = Alive
 step Dead  Dead  Dead  = Dead
 
-sample = [Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Alive]
+deads  0 = []
+deads  n = Dead  : deads (n-1)
 
-iter_ (x:y:z:[]) = [step x y z]
-iter_ (x:y:z:xs) =  step x y z : iter_ (y:z:xs)
+alives 0 = []
+alives n = Alive : alives (n-1)
 
---iter xs = a : iter_ xs : z
+sample = deads 19 ++ [Alive]
+
+
 iter xs = a : iter_ xs ++ [z]
     where
         a = step (last xs) (head xs) (xs !! 2)
         z = step ((reverse xs) !! 2) (head $ reverse xs) (head xs)
 
-rule110 xs 0 = []
-rule110 xs n = done : rule110 done (n-1)
-    where
-        done = iter xs
+iter_ (x:y:z:[]) = [step x y z]
+iter_ (x:y:z:xs) =  step x y z : iter_ (y:z:xs)
 
-display []     = putStrLn " "
+
+rule110 xs  n = xs : rule110' xs n
+
+rule110' xs 0 = []
+rule110' xs n = done : rule110' done (n-1)
+     where
+         done = iter xs
+
+
+display []     = return ()
 display (x:xs) = do
-                    putStrLn w
-                    display xs
-
-    where
-        w = conv x
+                   putStrLn $ conv x
+                   display xs
 
 conv []     = ""
 conv (x:xs)
     | x == Dead  = " " ++ conv xs
     | x == Alive = "x" ++ conv xs
+
+main = do
+    args <- getArgs
+    display $ rule110 (deads (read (args !! 0)) ++ [Alive] ) $ read (args !! 0)
+
+    return ()
