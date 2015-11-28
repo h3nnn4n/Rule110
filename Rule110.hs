@@ -12,7 +12,7 @@ step Dead  Alive Dead  = Alive
 step Dead  Dead  Alive = Alive
 step Dead  Dead  Dead  = Dead
 
-sample = [Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Alive]
+sample = [Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Dead, Alive]
 
 iter_ (x:y:z:[]) = [step x y z]
 iter_ (x:y:z:xs) =  step x y z : iter_ (y:z:xs)
