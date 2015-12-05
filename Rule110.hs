@@ -1,8 +1,9 @@
 import Control.Monad
+import Data.List
 import System.Environment
 import System.Exit
+import System.IO
 import System.Random
-import Data.List
 
 data Cell = Alive | Dead
     deriving (Show, Eq)
@@ -52,9 +53,16 @@ conv (x:xs)
     | x == Dead  = " " ++ conv xs
     | x == Alive = "x" ++ conv xs
 
---return $ take n (randomRs (0, 1) g)
+conv' []     = ""
+conv' (x:xs)
+    | x == Dead  = "0 " ++ conv' xs
+    | x == Alive = "1 " ++ conv' xs
 
---numbersToCell :: (Eq a, Num a) => [a] -> IO [Cell]
+writeTape []     img = return ()
+writeTape (x:xs) img = do
+    hPutStrLn img $ conv' x
+    writeTape xs img
+
 numbersToCell [] = []
 numbersToCell (x:xs)
     | x == 1 = Alive : numbersToCell xs
@@ -65,7 +73,7 @@ randomlist n = take n . unfoldr (Just . randomR (0,1))
 
 main = do
     args <- getArgs
-    g <- newStdGen
+    g    <- newStdGen
 
     when (null args) $ error "Usage: ./rule110 size"
 
@@ -73,8 +81,17 @@ main = do
         tape = deads size ++ [Alive]
         word = numbersToCell $ randomlist size g
 
+    img  <- openFile "img.ppm" WriteMode
+
+    hPutStrLn img "P1"
+    hPutStrLn img $ show size ++ " " ++ show (size+1)
+
     --putStrLn $ show word
 
-    display $ rule110 word size
+    --display   $ rule110 word size
+    writeTape ( rule110 word size ) img
+
+    hClose img
     return ()
+
 
