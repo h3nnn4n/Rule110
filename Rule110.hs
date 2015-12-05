@@ -50,8 +50,8 @@ display (x:xs) = do
 
 conv []     = ""
 conv (x:xs)
-    | x == Dead  = " " ++ conv xs
-    | x == Alive = "x" ++ conv xs
+    | x == Dead  = " " ++  conv xs
+    | x == Alive = "x" ++  conv xs
 
 conv' []     = ""
 conv' (x:xs)
@@ -75,21 +75,22 @@ main = do
     args <- getArgs
     g    <- newStdGen
 
-    when (null args) $ error "Usage: ./rule110 size"
+    when (null args) $ error "Usage: ./rule110 steps size"
 
-    let size = read (args !! 0)
-        tape = deads size ++ [Alive]
-        word = numbersToCell $ randomlist size g
+    let size  = read (args !! 0) :: Int
+        steps = read (args !! 1) :: Int
+        tape  = deads steps ++ [Alive]
+        word  = numbersToCell $ randomlist size g
 
     img  <- openFile "img.ppm" WriteMode
 
     hPutStrLn img "P1"
-    hPutStrLn img $ show size ++ " " ++ show (size+1)
+    hPutStrLn img $ show size ++ " " ++ show (steps+1)
 
     --putStrLn $ show word
 
-    --display   $ rule110 word size
-    writeTape ( rule110 word size ) img
+    --display   $ rule110 word steps
+    writeTape ( rule110 word steps ) img
 
     hClose img
     return ()
