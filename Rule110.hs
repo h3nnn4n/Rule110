@@ -1,8 +1,11 @@
+import Control.Monad
 import System.Environment
 import System.Exit
+import System.Random
+import Data.List
 
 data Cell = Alive | Dead
-     deriving (Show, Eq)
+    deriving (Show, Eq)
 
 step Alive Alive Alive = Dead
 step Alive Alive Dead  = Alive
@@ -35,22 +38,43 @@ rule110 xs  n = xs : rule110' xs n
 
 rule110' xs 0 = []
 rule110' xs n = done : rule110' done (n-1)
-     where
-         done = iter xs
+    where
+        done = iter xs
 
 
 display []     = return ()
 display (x:xs) = do
-                   putStrLn $ conv x
-                   display xs
+    putStrLn $ conv x
+    display xs
 
 conv []     = ""
 conv (x:xs)
     | x == Dead  = " " ++ conv xs
     | x == Alive = "x" ++ conv xs
 
+--return $ take n (randomRs (0, 1) g)
+
+--numbersToCell :: (Eq a, Num a) => [a] -> IO [Cell]
+numbersToCell [] = []
+numbersToCell (x:xs)
+    | x == 1 = Alive : numbersToCell xs
+    | x == 0 = Dead  : numbersToCell xs
+
+randomlist :: Int -> StdGen -> [Int]
+randomlist n = take n . unfoldr (Just . randomR (0,1))
+
 main = do
     args <- getArgs
-    display $ rule110 (deads (read (args !! 0)) ++ [Alive] ) $ read (args !! 0)
+    g <- newStdGen
 
+    when (null args) $ error "Usage: ./rule110 size"
+
+    let size = read (args !! 0)
+        tape = deads size ++ [Alive]
+        word = numbersToCell $ randomlist size g
+
+    --putStrLn $ show word
+
+    display $ rule110 word size
     return ()
+
